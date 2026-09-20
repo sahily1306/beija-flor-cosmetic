@@ -1,0 +1,137 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resumen contable</title>
+    <link rel="stylesheet" href="{% static 'contabilidad_app/dashboard.css' %}">
+</head>
+<body>
+    <div class="app-shell">
+        <aside class="sidebar">
+            <div class="brand">
+                <span class="brand-mark">C</span>
+                <span>Contabilidad</span>
+            </div>
+            <nav class="main-nav" aria-label="Navegación principal">
+                <a class="nav-link active" href="{% url 'dashboard' %}">
+                    <span class="nav-icon">⌂</span> Resumen
+                </a>
+                <a class="nav-link" href="/admin/contabilidad_app/cuenta/">
+                    <span class="nav-icon">▤</span> Cuentas
+                </a>
+                <a class="nav-link" href="{% url 'pedidos' %}">
+                    <span class="nav-icon">▣</span> Pedidos
+                </a>
+                <a class="nav-link" href="/admin/">
+                    <span class="nav-icon">⚙</span> Administración
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <span class="status-dot"></span>
+                Sistema conectado
+            </div>
+        </aside>
+
+        <main class="content">
+            <header class="topbar">
+                <div>
+                    <p class="eyebrow">Panel financiero</p>
+                    <h1>Resumen contable</h1>
+                    <p class="intro">Una vista clara de la estructura de tus cuentas.</p>
+                </div>
+                <a class="primary-button" href="/admin/contabilidad_app/cuenta/add/">+ Nueva cuenta</a>
+            </header>
+
+            <section class="metrics" aria-label="Indicadores principales">
+                <article class="metric-card accent-teal">
+                    <div class="metric-label">Cuentas registradas</div>
+                    <strong>{{ total_cuentas }}</strong>
+                    <span class="metric-note">En todo el catálogo</span>
+                </article>
+                <article class="metric-card accent-coral">
+                    <div class="metric-label">Cuentas activas</div>
+                    <strong>{{ cuentas_activas }}</strong>
+                    <span class="metric-note">Disponibles para usar</span>
+                </article>
+                <article class="metric-card accent-gold">
+                    <div class="metric-label">Tipos contables</div>
+                    <strong>{{ tipos_registrados|length }}</strong>
+                    <span class="metric-note">Categorías utilizadas</span>
+                </article>
+            </section>
+
+            <section class="dashboard-grid">
+                <article class="panel accounts-panel">
+                    <div class="panel-heading">
+                        <div>
+                            <p class="eyebrow">Catálogo</p>
+                            <h2>Cuentas contables</h2>
+                        </div>
+                        <a class="text-link" href="/admin/contabilidad_app/cuenta/">Ver todas <span aria-hidden="true">→</span></a>
+                    </div>
+                    {% if cuentas_recientes %}
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Código</th>
+                                    <th>Nombre</th>
+                                    <th>Tipo</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for cuenta in cuentas_recientes %}
+                                <tr>
+                                    <td class="code">{{ cuenta.codigo }}</td>
+                                    <td>{{ cuenta.nombre }}</td>
+                                    <td><span class="type-tag">{{ cuenta.get_tipo_display }}</span></td>
+                                    <td>
+                                        {% if cuenta.activa %}
+                                        <span class="state active-state">Activa</span>
+                                        {% else %}
+                                        <span class="state inactive-state">Inactiva</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="empty-state">
+                        <div class="empty-icon">+</div>
+                        <h3>Tu catálogo está vacío</h3>
+                        <p>Crea la primera cuenta para comenzar a organizar tu información.</p>
+                        <a class="primary-button" href="/admin/contabilidad_app/cuenta/add/">Crear primera cuenta</a>
+                    </div>
+                    {% endif %}
+                </article>
+
+                <article class="panel types-panel">
+                    <div class="panel-heading">
+                        <div>
+                            <p class="eyebrow">Distribución</p>
+                            <h2>Por tipo</h2>
+                        </div>
+                    </div>
+                    {% if tipos_registrados %}
+                    <ul class="type-list">
+                        {% for tipo in tipos_registrados %}
+                        <li>
+                            <span class="type-name">{{ tipo.tipo|title }}</span>
+                            <span class="type-count">{{ tipo.total }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <p class="muted-copy">Los tipos aparecerán cuando registres cuentas.</p>
+                    {% endif %}
+                </article>
+            </section>
+        </main>
+    </div>
+</body>
+</html>

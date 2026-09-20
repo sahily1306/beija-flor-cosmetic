@@ -1,0 +1,37 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pedidos | Beija-Flor Cosmetic</title>
+    <link rel="stylesheet" href="{% static 'contabilidad_app/dashboard.css' %}">
+</head>
+<body>
+<div class="app-shell">
+    <aside class="sidebar">
+        <div class="brand"><span class="brand-mark">B</span><span>Beija-Flor</span></div>
+        <nav class="main-nav" aria-label="Navegação principal">
+            <a class="nav-link" href="{% url 'dashboard' %}"><span class="nav-icon">⌂</span> Resumo</a>
+            <a class="nav-link active" href="{% url 'pedidos' %}"><span class="nav-icon">▣</span> Pedidos</a>
+            <a class="nav-link" href="/admin/"><span class="nav-icon">⚙</span> Administração</a>
+        </nav>
+        <div class="sidebar-footer"><span class="status-dot"></span>Sistema conectado</div>
+    </aside>
+    <main class="content orders-content">
+        <header class="topbar"><div><p class="eyebrow">Operação da loja</p><h1>Pedidos</h1><p class="intro">Separe, confira e acompanhe cada envio até o destino.</p></div><a class="primary-button" href="{% url 'tienda' %}">Ver loja</a></header>
+        {% if messages %}<div class="order-messages">{% for message in messages %}<p>{{ message }}</p>{% endfor %}</div>{% endif %}
+        <form class="order-filter" method="get"><label>Filtrar por estado<select name="estado"><option value="">Todos os pedidos</option>{% for value, label in estados %}<option value="{{ value }}" {% if estado_filtro == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></label><button class="secondary-button" type="submit">Filtrar</button></form>
+        <section class="orders-list">
+            {% for pedido in pedidos %}
+            <article class="order-card">
+                <div class="order-card-header"><div><p class="eyebrow">Pedido #{{ pedido.id }}</p><h2>{{ pedido.nombre_cliente }}</h2><small>{{ pedido.criado_en|date:'d/m/Y H:i' }} · {{ pedido.email_cliente }}</small></div><span class="order-status status-{{ pedido.estado|lower }}">{{ pedido.get_estado_display }}</span></div>
+                <div class="order-card-grid"><div><h3>Itens para separar</h3><ul class="order-items">{% for item in pedido.items.all %}<li><strong>{{ item.cantidad }}x</strong> {{ item.variacion.producto.nombre }} <span>{{ item.variacion.variedad }}</span></li>{% endfor %}</ul></div><div><h3>Destino</h3><p>{{ pedido.direccion_entrega }}<br>{{ pedido.ciudad }} - {{ pedido.provincia }}<br>CEP: {{ pedido.codigo_postal }}</p><p>{{ pedido.telefono_cliente }}<br>{{ pedido.email_cliente }}</p></div><div><h3>Pagamento</h3><p>R$ {{ pedido.total|floatformat:2 }}<br>{% if pedido.pagamento %}{{ pedido.pagamento.get_metodo_display }} · {{ pedido.pagamento.get_status_display }}{% endif %}</p></div></div>
+                <form class="order-update" method="post">{% csrf_token %}<input type="hidden" name="pedido_id" value="{{ pedido.id }}"><label>Estado<select name="estado">{% for value, label in estados %}<option value="{{ value }}" {% if pedido.estado == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></label><label>Transportadora<input name="transportadora" value="{{ pedido.transportadora }}" placeholder="Ex.: Correios"></label><label>Código de rastreio<input name="codigo_rastreio" value="{{ pedido.codigo_rastreio }}" placeholder="Código de envio"></label><button class="primary-button" type="submit">Salvar atualização</button></form>
+            </article>
+            {% empty %}<div class="empty-state"><div class="empty-icon">✓</div><h3>Nenhum pedido encontrado</h3><p>Os novos pedidos aparecerão aqui depois da confirmação da compra.</p></div>{% endfor %}
+        </section>
+    </main>
+</div>
+</body>
+</html>

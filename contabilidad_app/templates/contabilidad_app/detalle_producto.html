@@ -1,0 +1,31 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ producto.nombre }} | Beija-Flor Cosmetic</title>
+    <link rel="stylesheet" href="{% static 'contabilidad_app/store.css' %}">
+</head>
+<body>
+    <header class="shop-header">
+        <a class="shop-brand" href="{% url 'tienda' %}"><span class="brand-seal">BF</span><span><strong>Beija-Flor Cosmetic</strong><small>aromas e bem-estar</small></span></a>
+        <nav><a href="{% url 'tienda' %}">Volver a productos</a><a class="cart-link" href="{% url 'carrito' %}" aria-label="Abrir carrito" title="Abrir carrito"><span class="cart-icon" aria-hidden="true">&#128722;</span><span class="cart-count">{{ request.session.cart|length|default:0 }}</span></a></nav>
+    </header>
+    <main class="product-detail">
+        <a class="back-link" href="{% url 'tienda' %}">&larr; Voltar à loja</a>
+        <div class="detail-layout">
+            <section class="detail-gallery" aria-label="Fotos de {{ producto.nombre }}">
+                {% for foto in producto.imagenes.all %}<img src="{{ foto.imagen.url }}" alt="{{ producto.nombre }}">{% empty %}{% if producto.imagen %}<img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}">{% else %}<div class="detail-placeholder">{{ producto.nombre|slice:':1' }}</div>{% endif %}{% endfor %}
+            </section>
+            <section class="detail-info">
+                {% if producto.grupo %}<p class="eyebrow">{{ producto.grupo.nombre }}</p>{% endif %}
+                <h1>{{ producto.nombre }}</h1>
+                <p class="detail-description">{{ producto.descripcion|default:'Produzido artesanalmente com cuidado.' }}</p>
+                <div class="detail-variants">{% for variacion in producto.variaciones.all %}{% if variacion.activa and variacion.stock %}<div class="variant-row"><div><strong>{{ variacion.variedad }}</strong><small>{{ variacion.stock }} disponíveis</small></div><div class="variant-action"><b>R$ {{ variacion.precio|floatformat:2 }}</b><a class="add-button" href="{% url 'agregar_al_carrito' variacion.id %}" aria-label="Adicionar {{ variacion.variedad }}">+</a></div></div>{% endif %}{% empty %}<p class="detail-description">Este produto não tem variedades disponíveis.</p>{% endfor %}</div>
+            </section>
+        </div>
+    </main>
+    <footer><span>Beija-Flor Cosmetic</span><span>feito no Brasil · valores em reais</span></footer>
+</body>
+</html>
