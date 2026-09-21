@@ -1,0 +1,33 @@
+<section class="featured-products">
+    <div class="canva-section-heading">
+        <div><p class="canva-kicker">Produtos disponíveis</p><h2>Escolha seu próximo ritual</h2></div>
+        <p class="magazine-intro">Adicione à sacola ou compre imediatamente.</p>
+    </div>
+    <div class="product-grid">
+        {% for produto in productos %}
+        <article class="product-card">
+            <a class="product-image" href="{% url 'detalle_producto' produto.id %}" aria-label="Ver {{ produto.nombre }}">
+                {% with foto=produto.imagenes.all|first %}
+                {% if foto %}<img src="{{ foto.imagen.url }}" alt="{{ produto.nombre }}">
+                {% elif produto.imagen %}<img src="{{ produto.imagen.url }}" alt="{{ produto.nombre }}">
+                {% else %}<span class="product-placeholder">{{ produto.nombre|slice:':1' }}</span>{% endif %}
+                {% endwith %}
+            </a>
+            <div class="product-info">
+                <p class="product-category">{{ produto.grupo.nombre|default:'Beija-Flor' }}</p>
+                <h2><a class="product-title-link" href="{% url 'detalle_producto' produto.id %}">{{ produto.nombre }}</a></h2>
+                <div class="variants">
+                    {% for variacao in produto.variaciones.all %}
+                    {% if variacao.activa and variacao.stock %}
+                    <div class="variant-row">
+                        <div><strong>{{ variacao.variedad }}</strong><small>{{ variacao.stock }} disponíveis</small></div>
+                        <div class="variant-action"><b>R$ {{ variacao.precio|floatformat:2 }}</b><a class="add-button" href="{% url 'agregar_al_carrito' variacao.id %}?next={{ request.get_full_path|urlencode }}" aria-label="Adicionar {{ variacao.variedad }}">+</a><a class="button button-dark buy-now-button" href="{% url 'comprar_ahora' variacao.id %}">Comprar agora</a></div>
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        </article>
+        {% empty %}<p>Ainda estamos preparando nossos produtos.</p>{% endfor %}
+    </div>
+</section>

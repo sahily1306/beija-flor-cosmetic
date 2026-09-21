@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 150" role="img" aria-labelledby="title desc">
+  <title id="title">Beija-Flor</title>
+  <desc id="desc">Logo Beija-Flor aroma e bem-estar com um colibri estilizado</desc>
+  <g fill="none" stroke="#c39a63" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="76" cy="75" r="57" stroke-width="3"/>
+    <path d="M45 86c13-23 31-35 54-36-8 8-11 17-8 27 4 13 19 17 29 9-5 15-18 23-34 21-15-2-29-10-41-21Z" fill="#c39a63" stroke="none"/>
+    <path d="M87 51c15-18 30-27 48-31-8 14-16 26-25 36" stroke-width="5"/>
+    <path d="M119 82c14 1 25 7 34 17-15 5-28 3-39-4" stroke-width="4"/>
+    <path d="M48 96c-11 12-21 18-32 20" stroke-width="3"/>
+  </g>
+  <text x="158" y="77" fill="#171717" font-family="Georgia, serif" font-size="43" font-weight="600" letter-spacing="4">BEIJA-FLOR</text>
+  <text x="160" y="111" fill="#77736c" font-family="Arial, sans-serif" font-size="14" letter-spacing="4">AROMA E BEM-ESTAR</text>
+</svg>

@@ -1,0 +1,243 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ayuda | Beija-Flor</title>
+    <link rel="stylesheet" href="{% static 'contabilidad_app/store.css' %}?v=12">
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #fffaf6 0%, #f7efe8 38%, #f4f7fb 100%);
+            color: #1c2331;
+        }
+        .help-shell {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 48px 20px 80px;
+        }
+        .hero-badge {
+            display: inline-block;
+            background: #f9e5d8;
+            color: #7c4a2d;
+            border-radius: 999px;
+            padding: 8px 14px;
+            font-size: 12px;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+        .help-hero {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 28px;
+            align-items: center;
+            background: linear-gradient(135deg, rgba(255,255,255,0.94), rgba(255,255,255,0.8));
+            border: 1px solid rgba(129, 104, 75, 0.13);
+            border-radius: 28px;
+            padding: 36px;
+            box-shadow: 0 20px 60px rgba(36, 27, 20, 0.08);
+        }
+        .help-copy h1 {
+            margin: 0;
+            font-size: clamp(2.4rem, 4vw, 4rem);
+            line-height: 1.05;
+            color: #1c2331;
+        }
+        .help-copy p {
+            color: #4b5563;
+            font-size: 1.08rem;
+            line-height: 1.7;
+            max-width: 62ch;
+            margin-top: 18px;
+        }
+        .cta-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 22px;
+        }
+        .cta {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 14px 22px;
+            border-radius: 999px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: transform 0.2s ease;
+        }
+        .cta:hover {
+            transform: translateY(-1px);
+        }
+        .cta.primary {
+            background: linear-gradient(135deg, #b9805d, #d7a27a);
+            color: white;
+            box-shadow: 0 14px 28px rgba(185, 128, 93, 0.28);
+        }
+        .cta.secondary {
+            background: #edf1f7;
+            color: #1f2937;
+        }
+        .support-visual {
+            background: linear-gradient(135deg, #f8eee5, #f4f7ff);
+            border-radius: 24px;
+            padding: 22px;
+            border: 1px solid rgba(148, 163, 184, 0.25);
+            min-height: 260px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .chat-mock {
+            width: 100%;
+            max-width: 330px;
+            background: #fff;
+            border-radius: 18px;
+            box-shadow: 0 18px 45px rgba(15, 23, 42, 0.1);
+            padding: 18px;
+        }
+        .chat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            font-size: 0.85rem;
+            color: #475569;
+        }
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #22c55e;
+            display: inline-block;
+            margin-right: 8px;
+        }
+        .bubble {
+            padding: 12px 14px;
+            border-radius: 14px;
+            margin-bottom: 12px;
+            line-height: 1.5;
+            font-size: 0.93rem;
+        }
+        .bubble.user {
+            background: #f3e2d7;
+            color: #3f2b1d;
+            margin-left: 30px;
+        }
+        .bubble.bot {
+            background: #eef3ff;
+            color: #1f2937;
+            margin-right: 30px;
+        }
+        .card-grid {
+            margin-top: 34px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+        }
+        .info-card {
+            background: rgba(255,255,255,0.8);
+            border: 1px solid rgba(148, 163, 184, 0.18);
+            border-radius: 22px;
+            padding: 22px;
+            box-shadow: 0 14px 32px rgba(15, 23, 42, 0.04);
+        }
+        .info-card strong {
+            display: block;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            color: #1c2331;
+        }
+        .info-card p {
+            margin: 0;
+            color: #4b5563;
+            line-height: 1.7;
+        }
+        .questions {
+            margin-top: 36px;
+            background: rgba(255,255,255,0.8);
+            border: 1px solid rgba(148, 163, 184, 0.18);
+            border-radius: 24px;
+            padding: 28px 24px;
+        }
+        .questions h2 {
+            margin-top: 0;
+            color: #1c2331;
+        }
+        ul {
+            margin: 0;
+            padding-left: 18px;
+            line-height: 2;
+            color: #374151;
+        }
+        @media (max-width: 820px) {
+            .help-hero {
+                grid-template-columns: 1fr;
+            }
+            .help-shell {
+                padding-top: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="help-shell">
+        <div class="help-hero">
+            <div class="help-copy">
+                <span class="hero-badge">Centro de ayuda</span>
+                <h1>¿Necesitas ayuda con tu pedido, pago o entrega?</h1>
+                <p>
+                    Aquí puedes resolver dudas rápidas con nuestro asistente de atención con IA,
+                    pensado para responder de forma clara y real sobre compras, devoluciones,
+                    políticas y soporte general.
+                </p>
+                <div class="cta-row">
+                    <a class="cta primary" href="http://127.0.0.1:8000/chat/" target="_blank" rel="noopener">Abrir atención con IA</a>
+                    <a class="cta secondary" href="{% url 'tienda' %}">Volver a la tienda</a>
+                </div>
+            </div>
+
+            <div class="support-visual" aria-hidden="true">
+                <div class="chat-mock">
+                    <div class="chat-header">
+                        <span><span class="status-dot"></span>IA de soporte</span>
+                        <span>online</span>
+                    </div>
+                    <div class="bubble user">Quiero saber sobre mi compra.</div>
+                    <div class="bubble bot">Claro. Puedo ayudarte con el estado del pedido, el pago y la entrega.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-grid">
+            <div class="info-card">
+                <strong>Atención con IA</strong>
+                <p>Responde dudas sobre pedidos, pagos, devoluciones y soporte general con información clara y útil.</p>
+            </div>
+            <div class="info-card">
+                <strong>Información actualizada</strong>
+                <p>Se puede alimentar con políticas reales del negocio desde el panel de administración para mejorar respuestas.</p>
+            </div>
+            <div class="info-card">
+                <strong>Soporte rápido</strong>
+                <p>Ayuda a resolver dudas sin necesidad de esperar una respuesta manual o perder tiempo buscando información.</p>
+            </div>
+        </div>
+
+        <div class="questions">
+            <h2>Qué puedes consultar</h2>
+            <ul>
+                <li>Estado de un pedido</li>
+                <li>Cancelación o devolución</li>
+                <li>Formas de pago</li>
+                <li>Políticas de entrega</li>
+                <li>Información sobre productos y promociones</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

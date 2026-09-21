@@ -23,13 +23,10 @@ from contabilidad_app import views
 
 urlpatterns = [
     path('', views.tienda, name='tienda'),
-    path('grupo/<int:grupo_id>/', views.tienda, name='tienda_grupo'),
-    path('producto/<int:producto_id>/', views.detalle_producto, name='detalle_producto'),
+    path('chat/', views.atendimento_ia, name='atendimento_ia'),
     path('carrito/', views.carrito, name='carrito'),
     path('carrito/agregar/<int:variacion_id>/', views.agregar_al_carrito, name='agregar_al_carrito'),
-    path('carrito/eliminar/<int:variacion_id>/', views.eliminar_del_carrito, name='eliminar_del_carrito'),
     path('carrito/confirmar/', views.confirmar_compra, name='confirmar_compra'),
     path('gestion/', views.dashboard, name='dashboard'),
-    path('gestion/pedidos/', views.pedidos, name='pedidos'),
     path('admin/', admin.site.urls),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

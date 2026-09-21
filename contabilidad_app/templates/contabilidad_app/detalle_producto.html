@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ producto.nombre }} | Beija-Flor Cosmetic</title>
-    <link rel="stylesheet" href="{% static 'contabilidad_app/store.css' %}">
+    <link rel="stylesheet" href="{% static 'contabilidad_app/store.css' %}?v=9">
 </head>
 <body>
     <header class="shop-header">
@@ -22,7 +22,7 @@
                 {% if producto.grupo %}<p class="eyebrow">{{ producto.grupo.nombre }}</p>{% endif %}
                 <h1>{{ producto.nombre }}</h1>
                 <p class="detail-description">{{ producto.descripcion|default:'Produzido artesanalmente com cuidado.' }}</p>
-                <div class="detail-variants">{% for variacion in producto.variaciones.all %}{% if variacion.activa and variacion.stock %}<div class="variant-row"><div><strong>{{ variacion.variedad }}</strong><small>{{ variacion.stock }} disponíveis</small></div><div class="variant-action"><b>R$ {{ variacion.precio|floatformat:2 }}</b><a class="add-button" href="{% url 'agregar_al_carrito' variacion.id %}" aria-label="Adicionar {{ variacion.variedad }}">+</a></div></div>{% endif %}{% empty %}<p class="detail-description">Este produto não tem variedades disponíveis.</p>{% endfor %}</div>
+                <div class="detail-variants">{% for variacion in producto.variaciones.all %}{% if variacion.activa and variacion.stock %}<div class="variant-row"><div><strong>{{ variacion.variedad }}</strong><small>{{ variacion.stock }} disponíveis</small></div><div class="variant-action"><b>R$ {{ variacion.precio|floatformat:2 }}</b><a class="add-button" href="{% url 'agregar_al_carrito' variacion.id %}?next={{ request.get_full_path|urlencode }}" aria-label="Adicionar {{ variacion.variedad }}">+</a><a class="button button-dark buy-now-button" href="{% url 'comprar_ahora' variacion.id %}">Comprar agora</a></div></div>{% endif %}{% empty %}<p class="detail-description">Este produto não tem variedades disponíveis.</p>{% endfor %}</div>
             </section>
         </div>
     </main>

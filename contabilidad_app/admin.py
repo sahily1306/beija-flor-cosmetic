@@ -2,11 +2,8 @@ from django.contrib import admin
 from .models import (
 	AsientoContable,
 	Cuenta,
-	GrupoProducto,
-	ImagenProducto,
 	ItemPedido,
 	MovimientoContable,
-	Pagamento,
 	Pedido,
 	Producto,
 	VariacionProducto,
@@ -20,29 +17,17 @@ class CuentaAdmin(admin.ModelAdmin):
 	search_fields = ('codigo', 'nombre')
 
 
-@admin.register(GrupoProducto)
-class GrupoProductoAdmin(admin.ModelAdmin):
-	list_display = ('nombre', 'activo')
-	list_filter = ('activo',)
-	search_fields = ('nombre',)
-
-
 class VariacionInline(admin.TabularInline):
 	model = VariacionProducto
 	extra = 1
 
 
-class ImagenProductoInline(admin.TabularInline):
-	model = ImagenProducto
-	extra = 2
-
-
 @admin.register(Producto)
 class ProductoAdmin(admin.ModelAdmin):
-	list_display = ('nombre', 'grupo', 'activo')
-	list_filter = ('activo', 'grupo')
+	list_display = ('nombre', 'categoria', 'activo')
+	list_filter = ('activo', 'categoria')
 	search_fields = ('nombre', 'descripcion')
-	inlines = (ImagenProductoInline, VariacionInline)
+	inlines = (VariacionInline,)
 
 
 @admin.register(VariacionProducto)
@@ -60,17 +45,10 @@ class ItemPedidoInline(admin.TabularInline):
 
 @admin.register(Pedido)
 class PedidoAdmin(admin.ModelAdmin):
-	list_display = ('id', 'nombre_cliente', 'email_cliente', 'estado', 'total', 'transportadora', 'codigo_rastreio', 'creado_en')
+	list_display = ('id', 'nombre_cliente', 'email_cliente', 'estado', 'total', 'creado_en')
 	list_filter = ('estado', 'creado_en')
-	search_fields = ('nombre_cliente', 'email_cliente', 'codigo_rastreio')
+	search_fields = ('nombre_cliente', 'email_cliente')
 	inlines = (ItemPedidoInline,)
-
-
-@admin.register(Pagamento)
-class PagamentoAdmin(admin.ModelAdmin):
-	list_display = ('pedido', 'metodo', 'status', 'valor', 'transacao', 'criado_en')
-	list_filter = ('metodo', 'status', 'criado_en')
-	search_fields = ('transacao', 'pedido__nombre_cliente', 'pedido__email_cliente')
 
 
 @admin.register(AsientoContable)

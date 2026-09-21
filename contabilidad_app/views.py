@@ -1,48 +1,28 @@
 from decimal import Decimal
 
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.db.models import Count
 from django.shortcuts import get_object_or_404, redirect, render
-from django.utils import timezone
 
 from .models import (
 	AsientoContable,
 	Cuenta,
 	ItemPedido,
 	MovimientoContable,
-	Pagamento,
 	Pedido,
 	Producto,
-	GrupoProducto,
 	VariacionProducto,
 )
 
 
-def tienda(request, grupo_id=None):
-	grupos = GrupoProducto.objects.filter(activo=True)
-	grupo_seleccionado = None
-	productos = Producto.objects.filter(
-		activo=True,
-		variaciones__activa=True,
-	).prefetch_related('variaciones').distinct()
-	if grupo_id is not None:
-		grupo_seleccionado = get_object_or_404(grupos, pk=grupo_id)
-	return render(request, 'contabilidad_app/tienda.html', {
-		'productos': productos,
-		'grupos': grupos,
-		'grupo_seleccionado': grupo_seleccionado,
-	})
+def tienda(request):
+	productos = Producto.objects.filter(activo=True, variaciones__activa=True).prefetch_related('variaciones').distinct()
+	return render(request, 'contabilidad_app/tienda.html', {'productos': productos})
 
 
-def detalle_producto(request, producto_id):
-	producto = get_object_or_404(
-		Producto.objects.prefetch_related('imagenes', 'variaciones'),
-		pk=producto_id,
-		activo=True,
-	)
-	return render(request, 'contabilidad_app/detalle_producto.html', {'producto': producto})
+def atendimento_ia(request):
+	return render(request, 'contabilidad_app/atendimento con ia/chat.html')
 
 
 def agregar_al_carrito(request, variacion_id):
@@ -59,16 +39,6 @@ def agregar_al_carrito(request, variacion_id):
 	return redirect('tienda')
 
 
-def eliminar_del_carrito(request, variacion_id):
-	if request.method == 'POST':
-		cart = request.session.get('cart', {})
-		if str(variacion_id) in cart:
-			del cart[str(variacion_id)]
-			request.session['cart'] = cart
-			messages.success(request, 'Producto eliminado de la sacola.')
-	return redirect('carrito')
-
-
 def carrito(request):
 	items = _items_del_carrito(request)
 	total = sum((item['subtotal'] for item in items), Decimal('0.00'))
@@ -82,22 +52,13 @@ def confirmar_compra(request):
 
 	items = _items_del_carrito(request, bloquear_stock=True)
 	if not items:
-		messages.error(request, 'Seu carrinho está vazio.')
+		messages.error(request, 'Tu carrito está vacío.')
 		return redirect('carrito')
 
 	nombre = request.POST.get('nombre_cliente', '').strip()
 	email = request.POST.get('email_cliente', '').strip()
-	telefono = request.POST.get('telefono_cliente', '').strip()
-	direccion = request.POST.get('direccion_entrega', '').strip()
-	ciudad = request.POST.get('ciudad', '').strip()
-	provincia = request.POST.get('provincia', '').strip()
-	codigo_postal = request.POST.get('codigo_postal', '').strip()
-	metodo_pagamento = request.POST.get('metodo_pagamento', Pagamento.Metodo.PIX)
 	if not nombre or not email:
-		messages.error(request, 'Preencha seu nome e e-mail para confirmar a compra.')
-		return redirect('carrito')
-	if metodo_pagamento not in Pagamento.Metodo.values:
-		messages.error(request, 'Selecione uma forma de pagamento válida.')
+		messages.error(request, 'Completa tu nombre y correo para confirmar la compra.')
 		return redirect('carrito')
 
 	total = sum((item['subtotal'] for item in items), Decimal('0.00'))
@@ -107,22 +68,7 @@ def confirmar_compra(request):
 			messages.error(request, f'Ya no hay stock suficiente de {item["variacion"]}.')
 			return redirect('carrito')
 
-	pedido = Pedido.objects.create(
-		nombre_cliente=nombre,
-		email_cliente=email,
-		telefono_cliente=telefono,
-		direccion_entrega=direccion,
-		ciudad=ciudad,
-		provincia=provincia,
-		codigo_postal=codigo_postal,
-		total=total,
-	)
-	Pagamento.objects.create(
-		pedido=pedido,
-		metodo=metodo_pagamento,
-		valor=total,
-		transacao=f'SIM-{pedido.pk:08d}',
-	)
+	pedido = Pedido.objects.create(nombre_cliente=nombre, email_cliente=email, total=total)
 	for item in items:
 		variacion = item['variacion']
 		variacion.stock -= item['cantidad']
@@ -190,29 +136,4 @@ def dashboard(request):
 		'cuentas_recientes': cuentas[:6],
 	}
 	return render(request, 'contabilidad_app/dashboard.html', context)
-
-
-@login_required(login_url='/admin/login/')
-def pedidos(request):
-	if request.method == 'POST':
-		pedido = get_object_or_404(Pedido, pk=request.POST.get('pedido_id'))
-		estado = request.POST.get('estado', '')
-		if estado in Pedido.Estado.values:
-			pedido.estado = estado
-			pedido.transportadora = request.POST.get('transportadora', '').strip()
-			pedido.codigo_rastreio = request.POST.get('codigo_rastreio', '').strip()
-			pedido.save(update_fields=['estado', 'transportadora', 'codigo_rastreio'])
-			messages.success(request, f'Pedido #{pedido.pk} actualizado.')
-		return redirect('pedidos')
-
-	estado_filtro = request.GET.get('estado', '')
-	lista = Pedido.objects.prefetch_related('items__variacion__producto').all()
-	if estado_filtro in Pedido.Estado.values:
-		lista = lista.filter(estado=estado_filtro)
-	return render(request, 'contabilidad_app/pedidos.html', {
-		'pedidos': lista,
-		'estado_filtro': estado_filtro,
-		'estados': Pedido.Estado.choices,
-		'agora': timezone.now(),
-	})
 

@@ -1,0 +1,68 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atención con IA | Beija-Flor Cosmetic</title>
+    <style>
+        :root { --ink: #473639; --muted: #887477; --cream: #faf4ef; --paper: #fffdfb; --rose: #c47770; --line: #eaded9; }
+        * { box-sizing: border-box; }
+        body { margin: 0; color: var(--ink); background: var(--cream); font-family: Arial, sans-serif; }
+        .chat-page { width: min(760px, 92%); margin: 50px auto; }
+        .back-link { color: var(--rose); font-size: 13px; text-decoration: none; }
+        h1 { margin: 28px 0 8px; font-family: Georgia, serif; font-size: clamp(32px, 6vw, 52px); font-weight: 500; }
+        .intro { margin: 0 0 25px; color: var(--muted); line-height: 1.6; }
+        .chat-panel { padding: 25px; border: 1px solid var(--line); border-radius: 10px; background: var(--paper); box-shadow: 0 18px 45px #6b463812; }
+        .conversation { min-height: 190px; max-height: 360px; overflow-y: auto; padding-bottom: 18px; }
+        .message { width: fit-content; max-width: 85%; margin: 0 0 13px; padding: 12px 15px; border-radius: 8px; font-size: 14px; line-height: 1.5; }
+        .bot { color: var(--ink); background: #f1e3dc; }
+        .user { margin-left: auto; color: #fff; background: var(--rose); }
+        .chat-form { border-top: 1px solid var(--line); padding-top: 18px; }
+        label { display: block; margin-bottom: 8px; color: var(--ink); font-size: 13px; font-weight: 700; }
+        textarea { display: block; width: 100%; min-height: 110px; resize: vertical; padding: 13px; border: 1px solid #d9c9c4; border-radius: 6px; outline: none; color: var(--ink); background: #fff; font: inherit; font-size: 14px; }
+        textarea:focus { border-color: var(--rose); box-shadow: 0 0 0 3px #c4777026; }
+        .form-actions { display: flex; align-items: center; justify-content: space-between; gap: 15px; margin-top: 12px; }
+        .hint { color: var(--muted); font-size: 12px; }
+        button { padding: 12px 18px; border: 0; border-radius: 5px; color: #fff; background: var(--ink); font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
+        button:hover { background: var(--rose); }
+        @media (max-width: 520px) { .chat-page { margin-top: 28px; } .chat-panel { padding: 17px; } .form-actions { align-items: stretch; flex-direction: column; } button { width: 100%; } }
+    </style>
+</head>
+<body>
+    <main class="chat-page">
+        <a class="back-link" href="{% url 'tienda' %}">← Volver a la tienda</a>
+        <h1>Atención con IA</h1>
+        <p class="intro">Cuéntanos qué necesitas. Puedes escribir tu problema, duda sobre un pedido o pregunta sobre nuestros productos.</p>
+        <section class="chat-panel" aria-label="Chat de atención">
+            <div class="conversation" id="conversation" aria-live="polite">
+                <div class="message bot">Hola. ¿En qué podemos ayudarte?</div>
+            </div>
+            <form class="chat-form" id="chat-form">
+                <label for="problema">Escribe tu problema o pregunta</label>
+                <textarea id="problema" name="problema" placeholder="Por ejemplo: No recibí mi pedido o quiero saber qué aroma tiene una vela." autocomplete="off" required></textarea>
+                <div class="form-actions">
+                    <span class="hint">La atención automática está en modo inicial.</span>
+                    <button type="submit">Enviar mensaje</button>
+                </div>
+            </form>
+        </section>
+    </main>
+    <script>
+        const form = document.getElementById('chat-form');
+        const input = document.getElementById('problema');
+        const conversation = document.getElementById('conversation');
+        form.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const text = input.value.trim();
+            if (!text) return;
+            conversation.insertAdjacentHTML('beforeend', `<div class="message user"></div>`);
+            conversation.lastElementChild.textContent = text;
+            conversation.insertAdjacentHTML('beforeend', '<div class="message bot">Recibimos tu mensaje. Nuestro equipo revisará tu solicitud y te ayudará con tu pedido o producto.</div>');
+            input.value = '';
+            input.focus();
+            conversation.scrollTop = conversation.scrollHeight;
+        });
+    </script>
+</body>
+</html>

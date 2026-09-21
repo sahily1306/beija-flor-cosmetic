@@ -118,32 +118,6 @@ td { padding: 15px 17px; border-top: 1px solid #efeee9; white-space: nowrap; }
 .empty-icon { display: grid; width: 40px; height: 40px; margin: 0 auto 14px; place-items: center; border-radius: 50%; color: var(--teal); background: var(--teal-soft); font-size: 22px; }
 .empty-state h3 { margin-bottom: 8px; font-size: 16px; }
 .empty-state p { margin: 0 auto 20px; max-width: 300px; color: var(--muted); font-size: 13px; line-height: 1.5; }
-.orders-content { max-width: 1450px; }
-.order-filter { display: flex; align-items: end; gap: 12px; margin-bottom: 22px; }
-.order-filter label, .order-update label { display: grid; gap: 6px; color: var(--muted); font-size: 11px; font-weight: 700; }
-.order-filter select, .order-update input, .order-update select { min-height: 40px; padding: 0 11px; border: 1px solid var(--line); border-radius: 6px; color: var(--ink); background: var(--surface); font: inherit; }
-.secondary-button { min-height: 40px; padding: 0 15px; border: 1px solid var(--line); border-radius: 6px; color: var(--ink); background: var(--surface); font: inherit; font-size: 12px; font-weight: 700; cursor: pointer; }
-.orders-list { display: grid; gap: 16px; }
-.order-card { padding: 24px; border: 1px solid var(--line); border-radius: 9px; background: var(--surface); }
-.order-card-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; padding-bottom: 20px; border-bottom: 1px solid #efeee9; }
-.order-card-header h2 { margin-bottom: 5px; }
-.order-card-header small { color: var(--muted); }
-.order-status { padding: 7px 11px; border-radius: 20px; font-size: 11px; font-weight: 700; white-space: nowrap; }
-.status-confirmado { color: #775d29; background: #f6eac4; }
-.status-separando { color: #526778; background: #dce9f1; }
-.status-enviado { color: #466f5a; background: #dcefe2; }
-.status-entregue { color: #31744a; background: #ccebd5; }
-.status-cancelado { color: #9a5048; background: #f7dcd7; }
-.order-card-grid { display: grid; grid-template-columns: 1.2fr 1fr .7fr; gap: 25px; padding: 20px 0; }
-.order-card-grid h3 { margin-bottom: 9px; color: var(--muted); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
-.order-card-grid p { margin-bottom: 10px; font-size: 13px; line-height: 1.6; }
-.order-items { margin: 0; padding: 0; list-style: none; font-size: 13px; line-height: 1.8; }
-.order-items strong { color: var(--teal); }
-.order-items span { color: var(--muted); }
-.order-update { display: grid; grid-template-columns: 180px 1fr 1fr auto; align-items: end; gap: 12px; padding-top: 18px; border-top: 1px solid #efeee9; }
-.order-messages { margin-bottom: 18px; padding: 12px 15px; border-radius: 6px; color: #31744a; background: #e3f2e7; font-size: 13px; }
-.order-messages p { margin: 0; }
-@media (max-width: 800px) { .order-filter, .order-update { align-items: stretch; flex-direction: column; } .order-card-grid, .order-update { grid-template-columns: 1fr; } .order-update .primary-button { width: 100%; } }
 
 @media (max-width: 800px) {
     .sidebar { width: 70px; padding: 22px 11px; }
