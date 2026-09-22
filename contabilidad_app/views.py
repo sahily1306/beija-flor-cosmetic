@@ -17,7 +17,7 @@ from .models import (
 
 
 def tienda(request):
-	productos = Producto.objects.filter(activo=True, variaciones__activa=True).prefetch_related('variaciones').distinct()
+	productos = Producto.objects.filter(activo=True, variaciones__activa=True).prefetch_related('variaciones').order_by('categoria', 'nombre').distinct()
 	return render(request, 'contabilidad_app/tienda.html', {'productos': productos})
 
 
