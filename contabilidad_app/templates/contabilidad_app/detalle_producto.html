@@ -5,27 +5,41 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ producto.nombre }} | Beija-Flor Cosmetic</title>
-    <link rel="stylesheet" href="{% static 'contabilidad_app/store.css' %}">
+    <link rel="stylesheet" href="{% static 'contabilidad_app/store.css' %}?v=20261006-17">
 </head>
 <body>
     <header class="shop-header">
-        <a class="shop-brand" href="{% url 'tienda' %}"><span class="brand-seal">BF</span><span><strong>Beija-Flor Cosmetic</strong><small>aromas e bem-estar</small></span></a>
-        <nav><a href="{% url 'tienda' %}">Volver a productos</a><a class="cart-link" href="{% url 'carrito' %}" aria-label="Abrir carrito" title="Abrir carrito"><span class="cart-icon" aria-hidden="true">&#128722;</span><span class="cart-count">{{ request.session.cart|length|default:0 }}</span></a></nav>
+        <a class="shop-brand" href="{% url 'tienda' %}"><img class="brand-logo" src="{% static 'contabilidad_app/logo-beija-flor-simbolo.png' %}" alt="Símbolo Beija-Flor"><span><strong>Beija-Flor Cosmetic</strong><small>aromas e bem-estar</small></span></a>
+        <nav><a href="{% url 'tienda' %}">Volver a productos</a><a class="cart-link" href="{% url 'carrito' %}" aria-label="Abrir carrito" title="Abrir carrito"><b class="cart-icon" aria-hidden="true">🛒</b><span class="cart-count">{{ cart_quantity }}</span></a></nav>
     </header>
     <main class="product-detail">
         <a class="back-link" href="{% url 'tienda' %}">&larr; Voltar à loja</a>
         <div class="detail-layout">
             <section class="detail-gallery" aria-label="Fotos de {{ producto.nombre }}">
-                {% for foto in producto.imagenes.all %}<img src="{{ foto.imagen.url }}" alt="{{ producto.nombre }}">{% empty %}{% if producto.imagen %}<img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}">{% else %}<div class="detail-placeholder">{{ producto.nombre|slice:':1' }}</div>{% endif %}{% endfor %}
+                {% if producto.imagen %}<img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}">{% else %}<div class="detail-placeholder">{{ producto.nombre|slice:':1' }}</div>{% endif %}
             </section>
             <section class="detail-info">
-                {% if producto.grupo %}<p class="eyebrow">{{ producto.grupo.nombre }}</p>{% endif %}
+                {% if producto.categoria %}<p class="eyebrow">{{ producto.categoria }}</p>{% endif %}
                 <h1>{{ producto.nombre }}</h1>
                 <p class="detail-description">{{ producto.descripcion|default:'Produzido artesanalmente com cuidado.' }}</p>
-                <div class="detail-variants">{% for variacion in producto.variaciones.all %}{% if variacion.activa and variacion.stock %}<div class="variant-row"><div><strong>{{ variacion.variedad }}</strong><small>{{ variacion.stock }} disponíveis</small></div><div class="variant-action"><b>R$ {{ variacion.precio|floatformat:2 }}</b><a class="add-button" href="{% url 'agregar_al_carrito' variacion.id %}" aria-label="Adicionar {{ variacion.variedad }}">+</a></div></div>{% endif %}{% empty %}<p class="detail-description">Este produto não tem variedades disponíveis.</p>{% endfor %}</div>
+                <div class="detail-variants">
+                    {% for variacion in producto.variaciones.all %}
+                    {% if variacion.activa %}
+                    <div class="variant-row">
+                        <div><strong>{{ variacion.variedad }}</strong><small>{% if variacion.stock %}{{ variacion.stock }} disponíveis{% else %}Indisponível{% endif %}</small></div>
+                        <div class="variant-action">
+                            <b>R$ {{ variacion.precio|floatformat:2 }}</b>
+                            {% if variacion.stock %}<a class="button button-dark" href="{% url 'agregar_al_carrito' variacion.id %}">Agregar al carrito</a>{% endif %}
+                        </div>
+                    </div>
+                    {% if variacion.stock %}<form class="buy-now-form" method="post" action="{% url 'comprar_ahora' variacion.id %}">{% csrf_token %}<button class="button button-dark buy-now-button" type="submit">Comprar agora</button></form>{% endif %}
+                    {% endif %}
+                    {% empty %}<p class="detail-description">Este produto não tem variedades disponíveis.</p>
+                    {% endfor %}
+                </div>
             </section>
         </div>
     </main>
-    <footer><span>Beija-Flor Cosmetic</span><span>feito no Brasil · valores em reais</span></footer>
+    <footer><span>Beija-Flor Cosmetic</span><address class="footer-contact"><a class="footer-address" href="https://www.google.com/maps/search/?api=1&amp;query=Avenida%20Dom%20Pedro%20II%201206%2C%20Quatro%20Barras%2C%20Paran%C3%A1%2C%20Brazil" target="_blank" rel="noopener noreferrer">Avenida Dom Pedro II, 1206</a><a href="tel:+5541997066909">(41) 99706-6909</a></address><span>feito no Brasil · valores em reais</span></footer>
 </body>
 </html>

@@ -44,6 +44,7 @@ body {
     font-family: 'Playfair Display', serif;
     font-size: 20px;
 }
+.brand-logo { display: block; width: 42px; height: 42px; object-fit: contain; }
 
 .main-nav { display: grid; gap: 7px; margin-top: 74px; }
 .nav-link {
@@ -149,6 +150,7 @@ td { padding: 15px 17px; border-top: 1px solid #efeee9; white-space: nowrap; }
     .sidebar { width: 70px; padding: 22px 11px; }
     .brand { justify-content: center; }
     .brand > span:last-child, .nav-link:not(.active) { display: none; }
+    .brand-logo { width: 42px; height: 42px; }
     .main-nav { margin-top: 54px; }
     .nav-link { justify-content: center; padding: 12px 0; }
     .sidebar-footer { display: none; }

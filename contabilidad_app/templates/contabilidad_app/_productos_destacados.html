@@ -1,7 +1,7 @@
-<section class="featured-products">
-    <div class="canva-section-heading">
-        <div><p class="canva-kicker">Produtos disponíveis</p><h2>Escolha seu próximo ritual</h2></div>
-        <p class="magazine-intro">Adicione à sacola ou compre imediatamente.</p>
+<section class="featured-products products-section">
+    <div class="section-heading">
+        <div><p class="eyebrow">produtos disponíveis</p><h2>Escolha seu próximo ritual</h2></div>
+        <p>Adicione à sacola ou compre imediatamente.</p>
     </div>
     <div class="product-grid">
         {% for produto in productos %}
@@ -18,13 +18,36 @@
                 <h2><a class="product-title-link" href="{% url 'detalle_producto' produto.id %}">{{ produto.nombre }}</a></h2>
                 <div class="variants">
                     {% for variacao in produto.variaciones.all %}
-                    {% if variacao.activa and variacao.stock %}
+                    {% if variacao.activa %}
                     <div class="variant-row">
-                        <div><strong>{{ variacao.variedad }}</strong><small>{{ variacao.stock }} disponíveis</small></div>
-                        <div class="variant-action"><b>R$ {{ variacao.precio|floatformat:2 }}</b><a class="add-button" href="{% url 'agregar_al_carrito' variacao.id %}?next={{ request.get_full_path|urlencode }}" aria-label="Adicionar {{ variacao.variedad }}">+</a><a class="button button-dark buy-now-button" href="{% url 'comprar_ahora' variacao.id %}">Comprar agora</a></div>
+                        <div><strong>{{ variacao.variedad }}</strong><small>{% if variacao.stock %}{{ variacao.stock }} disponíveis{% else %}Indisponível{% endif %}</small></div>
+                        <div class="variant-action"><b>R$ {{ variacao.precio|floatformat:2 }}</b></div>
                     </div>
                     {% endif %}
                     {% endfor %}
+                </div>
+                <div class="product-card-actions">
+                    <a class="button button-dark" href="{% url 'detalle_producto' produto.id %}">Agregar al carrito</a>
+                    {% if produto.tiene_stock %}
+                    <details class="product-buy-selector">
+                        <summary class="button button-urgent">Comprar agora</summary>
+                        <form method="post" action="{% url 'comprar_producto_ahora' produto.id %}">
+                            {% csrf_token %}
+                            <label>Elige una variación
+                                <select name="variacion_id" required>
+                                    {% for variacao in produto.variaciones.all %}
+                                    {% if variacao.activa and variacao.stock %}
+                                    <option value="{{ variacao.id }}">{{ variacao.variedad }} — R$ {{ variacao.precio|floatformat:2 }}</option>
+                                    {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </label>
+                            <button class="button button-urgent" type="submit">Ir a dados e pagamento</button>
+                        </form>
+                    </details>
+                    {% else %}
+                    <button class="button button-urgent" type="button" disabled>Sin stock</button>
+                    {% endif %}
                 </div>
             </div>
         </article>

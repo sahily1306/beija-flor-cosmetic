@@ -1,0 +1,82 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ nombre_coleccion }} | Beija-Flor Cosmetic</title>
+    <link rel="stylesheet" href="{% static 'contabilidad_app/store.css' %}?v=20261006-26">
+</head>
+<body>
+    <header class="shop-header">
+        <a class="shop-brand" href="{% url 'tienda' %}">
+            <img class="brand-logo" src="{% static 'contabilidad_app/logo-beija-flor-simbolo.png' %}" alt="Símbolo Beija-Flor">
+            <span><strong>Beija-Flor Cosmetic</strong><small>aromas e bem-estar</small></span>
+        </a>
+        <nav><a href="{% url 'tienda' %}">Coleções</a><a class="cart-link" href="{% url 'carrito' %}" aria-label="Abrir carrito"><b class="cart-icon" aria-hidden="true">🛒</b><span class="cart-count">{{ cart_quantity }}</span></a></nav>
+    </header>
+    <main class="products-section collection-page">
+        <a class="back-link" href="{% url 'tienda' %}">&larr; Todas las colecciones</a>
+        <div class="section-heading collection-heading"><div><p class="eyebrow">nossa seleção</p><h1>{{ nombre_coleccion }}</h1></div></div>
+        <div class="product-grid">
+            {% for produto in productos %}
+            <article class="product-card" id="producto-{{ produto.id }}">
+                <a class="product-image" href="{% url 'detalle_producto' produto.id %}" aria-label="{% if produto.nombre|lower == 'mini velas' %}Ver foto ampliada y variedades de {{ produto.nombre }}{% else %}Ver detalles de {{ produto.nombre }}{% endif %}">
+                    {% if produto.imagen %}<img src="{{ produto.imagen.url }}" alt="{{ produto.nombre }}">{% else %}<span class="product-placeholder">{{ produto.nombre|slice:':1' }}</span>{% endif %}
+                </a>
+                <div class="product-info">
+                    <h3>{{ produto.nombre }}</h3>
+                    <p>{% if produto.nombre|lower == 'mini velas' %}{{ produto.descripcion|default:'Produzido artesanalmente com cuidado.' }}{% else %}{{ produto.descripcion|default:'Produzido artesanalmente com cuidado.'|truncatechars:110 }}{% endif %}</p>
+                    {% if produto.nombre|lower == 'mini velas' %}
+                    <div class="variants">
+                        <div class="variant-row">
+                            <div><strong>Precio</strong></div>
+                            <div class="variant-action"><b>R$ {{ produto.precio_minimo|floatformat:2 }}</b></div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="variants">
+                        {% for variacao in produto.variaciones.all %}
+                        {% if variacao.activa %}
+                        <div class="variant-row">
+                            <div><strong>{{ variacao.variedad }}</strong><small>{% if variacao.stock %}{{ variacao.stock }} disponíveis{% else %}Indisponível{% endif %}</small></div>
+                            <div class="variant-action"><b>R$ {{ variacao.precio|floatformat:2 }}</b></div>
+                        </div>
+                        {% endif %}
+                        {% empty %}<p>Este produto não tem variedades disponíveis.</p>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    <div class="product-card-actions">
+                        <a class="button button-dark" href="{% url 'detalle_producto' produto.id %}">Agregar al carrito</a>
+                        {% if produto.tiene_stock %}
+                        <details class="product-buy-selector">
+                            <summary class="button button-urgent">Comprar ahora</summary>
+                            <form method="post" action="{% url 'comprar_producto_ahora' produto.id %}">
+                                {% csrf_token %}
+                                <label>Elige una variación
+                                    <select name="variacion_id" required>
+                                        {% for variacao in produto.variaciones.all %}
+                                        {% if variacao.activa and variacao.stock %}
+                                        <option value="{{ variacao.id }}">{{ variacao.variedad }} — R$ {{ variacao.precio|floatformat:2 }}</option>
+                                        {% endif %}
+                                        {% endfor %}
+                                    </select>
+                                </label>
+                                <button class="button button-urgent" type="submit">Ir a datos y pago</button>
+                            </form>
+                        </details>
+                        {% else %}
+                        <button class="button button-urgent" type="button" disabled>Sin stock</button>
+                        {% endif %}
+                    </div>
+                </div>
+            </article>
+            {% empty %}
+            <div class="empty-shop"><h2>Nenhum produto nesta coleção ainda.</h2><p>Volte às coleções para explorar outras opções.</p><a class="button button-dark" href="{% url 'tienda' %}">Ver coleções</a></div>
+            {% endfor %}
+        </div>
+    </main>
+    <footer><span>Beija-Flor Cosmetic</span><address class="footer-contact"><a class="footer-address" href="https://www.google.com/maps/search/?api=1&amp;query=Avenida%20Dom%20Pedro%20II%201206%2C%20Quatro%20Barras%2C%20Paran%C3%A1%2C%20Brazil" target="_blank" rel="noopener noreferrer">Avenida Dom Pedro II, 1206</a><a href="tel:+5541997066909">(41) 99706-6909</a></address><span>feito no Brasil · valores em reais</span></footer>
+</body>
+</html>

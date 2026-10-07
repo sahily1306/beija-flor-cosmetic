@@ -26,6 +26,7 @@ SECRET_KEY = 'django-insecure-pyx)7h=f0y^^72wh4#e+^wbfid2#rk(^a=2=fuo17rv^i8xzdw
 DEBUG = True
 
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '.trycloudflare.com']
+CSRF_TRUSTED_ORIGINS = ['https://opposite-valley-popularity-adds.trycloudflare.com']
 
 
 # Application definition
@@ -62,6 +63,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'contabilidad_app.context_processors.cart_quantity',
             ],
         },
     },

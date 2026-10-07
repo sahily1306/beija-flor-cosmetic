@@ -2,8 +2,9 @@ from decimal import Decimal
 
 from django.contrib import messages
 from django.db import transaction
-from django.db.models import Count
+from django.db.models import Count, Exists, Min, OuterRef, Q
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 
 from .models import (
 	AsientoContable,
@@ -12,13 +13,41 @@ from .models import (
 	MovimientoContable,
 	Pedido,
 	Producto,
+	Grupo,
 	VariacionProducto,
 )
 
 
 def tienda(request):
-	productos = Producto.objects.filter(activo=True, variaciones__activa=True).prefetch_related('variaciones').order_by('categoria', 'nombre').distinct()
+	stock_disponible = VariacionProducto.objects.filter(producto=OuterRef('pk'), activa=True, stock__gt=0)
+	productos = Producto.objects.filter(activo=True, variaciones__activa=True).annotate(
+		tiene_stock=Exists(stock_disponible),
+	).prefetch_related('variaciones').order_by('categoria', 'nombre').distinct()
 	return render(request, 'contabilidad_app/tienda.html', {'productos': productos})
+
+
+def tienda_grupo(request, grupo_id):
+	productos = Producto.objects.filter(activo=True, variaciones__activa=True)
+	productos_categoria = productos.filter(categoria__iexact=grupo_id)
+	if productos_categoria.exists():
+		productos = productos_categoria
+	else:
+		grupo = Grupo.objects.filter(pk=grupo_id).first() if grupo_id.isdigit() else None
+		productos = productos.filter(grupo=grupo) if grupo else productos.none()
+	stock_disponible = VariacionProducto.objects.filter(producto=OuterRef('pk'), activa=True, stock__gt=0)
+	productos = productos.annotate(
+		precio_minimo=Min('variaciones__precio', filter=Q(variaciones__activa=True)),
+		tiene_stock=Exists(stock_disponible),
+	).prefetch_related('variaciones').order_by('categoria', 'nombre').distinct()
+	return render(request, 'contabilidad_app/coleccion.html', {
+		'productos': productos,
+		'nombre_coleccion': grupo_id,
+	})
+
+
+def detalle_producto(request, producto_id):
+	producto = get_object_or_404(Producto.objects.prefetch_related('variaciones'), pk=producto_id, activo=True)
+	return render(request, 'contabilidad_app/detalle_producto.html', {'producto': producto})
 
 
 def atendimento_ia(request):
@@ -39,10 +68,70 @@ def agregar_al_carrito(request, variacion_id):
 	return redirect('tienda')
 
 
+def comprar_ahora(request, variacion_id):
+	if request.method != 'POST':
+		return redirect('carrito')
+
+	variacion = get_object_or_404(
+		VariacionProducto,
+		pk=variacion_id,
+		activa=True,
+		producto__activo=True,
+	)
+	cart = request.session.get('cart', {})
+	key = str(variacion.pk)
+	cantidad_actual = int(cart.get(key, 0))
+	if cantidad_actual >= variacion.stock:
+		messages.error(request, 'No hay más unidades disponibles de esta variedad.')
+		return redirect('carrito')
+
+	cart[key] = cantidad_actual + 1
+	request.session['cart'] = cart
+	messages.success(request, 'Producto agregado. Completa tus datos para finalizar la compra.')
+	return redirect(f"{reverse('carrito')}#datos-cliente")
+
+
+def comprar_producto_ahora(request, producto_id):
+	if request.method != 'POST':
+		return redirect('carrito')
+
+	variacion = get_object_or_404(
+		VariacionProducto,
+		pk=request.POST.get('variacion_id'),
+		producto_id=producto_id,
+		activa=True,
+		producto__activo=True,
+	)
+	cart = request.session.get('cart', {})
+	key = str(variacion.pk)
+	cantidad_actual = int(cart.get(key, 0))
+	if cantidad_actual >= variacion.stock:
+		messages.error(request, 'No hay más unidades disponibles de esta variedad.')
+		return redirect('detalle_producto', producto_id=producto_id)
+
+	cart[key] = cantidad_actual + 1
+	request.session['cart'] = cart
+	messages.success(request, 'Producto agregado. Completa tus datos para finalizar la compra.')
+	return redirect(f"{reverse('carrito')}#datos-cliente")
+
+
 def carrito(request):
 	items = _items_del_carrito(request)
 	total = sum((item['subtotal'] for item in items), Decimal('0.00'))
 	return render(request, 'contabilidad_app/carrito.html', {'items': items, 'total': total})
+
+
+def eliminar_del_carrito(request, variacion_id):
+	if request.method != 'POST':
+		return redirect('carrito')
+
+	cart = request.session.get('cart', {})
+	if cart.pop(str(variacion_id), None) is not None:
+		request.session['cart'] = cart
+		messages.success(request, 'Producto removido do carrinho.')
+	else:
+		messages.error(request, 'Este produto não está no carrinho.')
+	return redirect('carrito')
 
 
 @transaction.atomic
@@ -136,4 +225,3 @@ def dashboard(request):
 		'cuentas_recientes': cuentas[:6],
 	}
 	return render(request, 'contabilidad_app/dashboard.html', context)
-

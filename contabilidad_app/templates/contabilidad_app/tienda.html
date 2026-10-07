@@ -4,32 +4,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Beija-Flor Cosmetic | Beleza artesanal</title>
-    <link rel="stylesheet" href="{% static 'contabilidad_app/store.css' %}">
+    <title>Beija-Flor Cosmetic | Aromas e Bem-Estar</title>
+    <link rel="stylesheet" href="{% static 'contabilidad_app/store.css' %}?v=20261006-16">
+    <style>
+        .hero{display:block;width:100%;max-width:none;min-height:0;margin:18px 0 75px;padding:0}
+        .hero-art{position:relative;width:100%;height:clamp(180px,28vw,360px);min-height:0;margin:0;overflow:hidden;border-radius:0}
+        .hero-banner{display:block;width:100%;height:100%;object-fit:cover;object-position:center}
+        @media (max-width:750px) {
+            .hero-art{height:auto;overflow:visible}
+            .hero-banner{height:auto;object-fit:contain}
+            .shop-header nav .cart-link{display:inline-flex}
+        }
+    </style>
 </head>
-<body class="canva-home">
-    <header class="canva-nav">
-        <a class="canva-logo" href="{% url 'tienda' %}">BEIJA-FLOR <span>COSMETIC</span></a>
-        <nav><a href="#grupos">Coleções</a><a href="#revista">Revista</a><a href="#historia">Sobre nós</a><a class="cart-link" href="{% url 'carrito' %}" aria-label="Abrir carrinho" title="Abrir carrinho"><span class="cart-icon" aria-hidden="true">&#128722;</span><span class="cart-count">{{ request.session.cart|length|default:0 }}</span></a></nav>
+<body>
+    <header class="shop-header">
+        <a class="shop-brand" href="{% url 'tienda' %}">
+            <img class="brand-logo" src="{% static 'contabilidad_app/logo-beija-flor-simbolo.png' %}" alt="Símbolo Beija-Flor">
+            <span><strong>Beija-Flor Cosmetic</strong><small>aromas e bem-estar</small></span>
+        </a>
+        <nav><a class="cart-link" href="{% url 'carrito' %}" aria-label="Abrir carrito"><b class="cart-icon" aria-hidden="true">🛒</b><span class="cart-count">{{ cart_quantity }}</span></a></nav>
     </header>
-    {% if messages %}<div class="messages">{% for message in messages %}<p class="message">{{ message }}</p>{% endfor %}</div>{% endif %}
-    {% if grupo_seleccionado %}
-    <main class="catalog-page">
-        <a class="catalog-back" href="{% url 'tienda' %}">&larr; Voltar à página inicial</a>
-        <section class="catalog-heading"><p class="canva-kicker">Nossa coleção</p><h1>{{ grupo_seleccionado.nombre }}</h1><p>Descubra todos os produtos desta coleção.</p></section>
-        <div class="group-list catalog-groups" aria-label="Grupos de produtos">{% for grupo in grupos %}<a class="group-bubble {% if grupo.id == grupo_seleccionado.id %}selected{% endif %}" href="{% url 'tienda_grupo' grupo.id %}"><span class="group-circle">{{ grupo.nombre|slice:':1' }}</span><strong>{{ grupo.nombre }}</strong></a>{% endfor %}</div>
-        <div class="product-grid">{% for produto in productos %}<article class="product-card"><a class="product-image" href="{% url 'detalle_producto' produto.id %}" aria-label="Ver {{ produto.nombre }}">{% with foto=produto.imagenes.all|first %}{% if foto %}<img src="{{ foto.imagen.url }}" alt="{{ produto.nombre }}">{% elif produto.imagen %}<img src="{{ produto.imagen.url }}" alt="{{ produto.nombre }}">{% else %}<span class="product-placeholder">{{ produto.nombre|slice:':1' }}</span>{% endif %}{% endwith %}</a><div class="product-info"><p class="product-category">{{ grupo_seleccionado.nombre }}</p><h2><a class="product-title-link" href="{% url 'detalle_producto' produto.id %}">{{ produto.nombre }}</a></h2><p>{{ produto.descripcion|default:'Produzido artesanalmente com cuidado.'|truncatechars:110 }}</p><div class="variants">{% for variacao in produto.variaciones.all %}{% if variacao.activa and variacao.stock %}<div class="variant-row"><div><strong>{{ variacao.variedad }}</strong><small>{{ variacao.stock }} disponíveis</small></div><div class="variant-action"><b>R$ {{ variacao.precio|floatformat:2 }}</b><a class="add-button" href="{% url 'agregar_al_carrito' variacao.id %}" aria-label="Adicionar {{ variacao.variedad }}">+</a></div></div>{% endif %}{% endfor %}</div></div></article>{% empty %}<div class="empty-shop"><h3>Ainda estamos preparando esta coleção.</h3><p>Em breve você encontrará produtos aqui.</p></div>{% endfor %}</div>
-    </main>
-    {% else %}
+
     <main>
-        <section class="canva-hero"><div class="canva-hero-media"><img src="/media/revista/banner-principal.png" alt="Produtos artesanais Beija-Flor Cosmetic"><div class="canva-hero-copy"><p class="canva-kicker">Beleza feita com intenção</p><h1>Seu ritual.<br><em>Sua essência.</em></h1><p>Produtos artesanais para cuidar do corpo, perfumar seus espaços e transformar o cotidiano em um momento especial.</p><a class="canva-button" href="#grupos">Explorar coleções <span>&rarr;</span></a></div><span class="hero-stamp">100% artesanal</span></div></section>
-        <section class="canva-intro" id="historia"><p class="canva-kicker">Por que Beija-Flor</p><h2>Pequenos gestos que<br><em>mudam o dia.</em></h2><p>Acreditamos em uma beleza próxima, sensorial e consciente. Cada produto nasce em pequenos lotes, com ingredientes escolhidos e muito cuidado em cada detalhe.</p></section>
-        <section class="canva-categories" id="grupos"><div class="canva-section-heading"><p class="canva-kicker">Descubra seu ritual</p><h2>Escolha como você quer se sentir</h2></div><div class="canva-category-grid">{% for grupo in grupos %}<a class="canva-category {% if grupo.imagen %}has-image{% endif %}" href="{% url 'tienda_grupo' grupo.id %}">{% if grupo.imagen %}<img class="category-image" src="{{ grupo.imagen.url }}" alt="{{ grupo.nombre }}">{% endif %}<span class="category-number">0{{ forloop.counter }}</span><span class="category-letter">{{ grupo.nombre|slice:':1' }}</span><h3>{{ grupo.nombre }}</h3><span class="category-arrow">Explorar &rarr;</span></a>{% empty %}<p>Adicione grupos pelo painel administrativo.</p>{% endfor %}</div></section>
-        <section class="magazine-section" id="revista"><div class="canva-section-heading"><div><p class="canva-kicker">Revista Beija-Flor</p><h2>Rituais que<br><em>fazem bem.</em></h2></div><p class="magazine-intro">Ideias, ingredientes e pequenos cuidados para aproveitar mais sua rotina.</p></div><div class="magazine-grid"><article class="magazine-card"><img src="/media/revista/body-splash.png" alt="Mulher aplicando body splash"><div><p class="canva-kicker">Body splash</p><h3>Uma nuvem de aroma para começar o dia</h3><p>Borrife seu body splash nos pontos de pulsação, como pulsos e pescoço. As notas leves acompanham seus movimentos sem sobrecarregar a pele.</p></div></article><article class="magazine-card"><img src="/media/revista/sabonetes-artesanais.png" alt="Sabonetes artesanais naturais"><div><p class="canva-kicker">Sabonetes naturais</p><h3>A limpeza também pode ser um ritual</h3><p>Óleos vegetais e extratos botânicos ajudam a limpar com suavidade. Massageie a espuma na pele úmida e enxágue sem pressa.</p></div></article><article class="magazine-card"><img src="/media/revista/velas-aromaticas.png" alt="Vela aromática acesa em um ambiente relaxante"><div><p class="canva-kicker">Velas aromáticas</p><h3>Acenda uma pausa para desacelerar</h3><p>A luz quente e os aromas ajudam a criar um ambiente de descanso. Ventile o espaço e nunca deixe uma vela acesa sem supervisão.</p></div></article></div></section>
-        <section class="ingredient-band"><p class="canva-kicker">O que escolhemos para você</p><div><span>ÓLEOS VEGETAIS</span><span>EXTRATOS BOTÂNICOS</span><span>AROMAS CONSCIENTES</span></div></section>
-        <section class="canva-quote"><p>“A beleza também pode ser um momento de pausa.”</p><span>BEIJA-FLOR COSMETIC</span></section>
+        {% if messages %}<div class="messages">{% for message in messages %}<p class="message">{{ message }}</p>{% endfor %}</div>{% endif %}
+        <section class="hero">
+            <div class="hero-art" aria-label="Produtos Beija-Flor">
+                <img class="hero-banner" src="/media/revista/banner-principal.png" alt="Produtos artesanais Beija-Flor">
+            </div>
+        </section>
+
+        <section class="collections-section" aria-labelledby="collections-title">
+            <div class="section-heading"><div><p class="eyebrow">explore por categoria</p><h2 id="collections-title">Nossos universos</h2></div><p>Encontre o ritual que combina com você.</p></div>
+            <div class="collections-grid">
+                <a class="collection-card" href="{% url 'tienda_grupo' 'Body splash' %}"><img src="/media/grupos/body-splash.png" alt="Body splash"><span>Body splash</span></a>
+                <a class="collection-card" href="{% url 'tienda_grupo' 'Sabonetes artesanais' %}"><img src="/media/grupos/sabonetes-artesanais.png" alt="Sabonetes artesanais"><span>Sabonetes artesanais</span></a>
+                <a class="collection-card" href="{% url 'tienda_grupo' 'Velas aromáticas' %}"><img src="/media/grupos/velas-aromaticas.png" alt="Velas aromáticas"><span>Velas aromáticas</span></a>
+                <a class="collection-card" href="{% url 'tienda_grupo' 'Kits de presentes' %}"><img src="/media/grupos/kits_de_presentes.png" alt="Kits de presentes"><span>Kits de presentes</span></a>
+            </div>
+        </section>
+
+        <section class="services-section" aria-labelledby="services-title">
+            <div class="section-heading"><div><p class="eyebrow">beija-flor</p><h2 id="services-title">Serviços no nosso espaço</h2></div></div>
+            <div class="services-list">
+                <article class="service-item service-item-lash">
+                    <img src="{% static 'contabilidad_app/manicure.png' %}" alt="Profissional realizando um serviço de manicure">
+                    <div class="service-item-title"><span class="service-number">01</span><h3>Manicure e Pedicure</h3></div>
+                </article>
+                <article class="service-item service-item-lash">
+                    <img src="{% static 'contabilidad_app/lash-design.png' %}" alt="Profissional realizando um procedimento de Lash Design">
+                    <div class="service-item-title"><span class="service-number">02</span><h3>Lash Design</h3></div>
+                </article>
+            </div>
+        </section>
     </main>
-    {% endif %}
-    <footer class="canva-footer"><div><strong>BEIJA-FLOR</strong><span>COSMETIC</span></div><p>Feito com calma, pensado para você.</p><div><span>Contato</span><a href="mailto:hola@beijaflor.local">hola@beijaflor.local</a></div></footer>
+    <footer><span>Beija-Flor Cosmetic</span><address class="footer-contact"><a class="footer-address" href="https://www.google.com/maps/search/?api=1&amp;query=Avenida%20Dom%20Pedro%20II%201206%2C%20Quatro%20Barras%2C%20Paran%C3%A1%2C%20Brazil" target="_blank" rel="noopener noreferrer">Avenida Dom Pedro II, 1206</a><a href="tel:+5541997066909">(41) 99706-6909</a></address><span>feito no Brasil · valores em reais</span></footer>
 </body>
 </html>
